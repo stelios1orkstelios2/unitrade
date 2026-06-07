@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Inquiries Inbox')}"></head>
+<body class="bg-body-secondary bg-opacity-10">
+
+  <!-- NAVBAR -->
+  <nav th:replace="~{fragments :: navbar}"></nav>
+
+  <div class="container my-5">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1"><i class="bi bi-chat-left-text text-primary me-2"></i>Inquiries Inbox</h2>
+        <p class="text-muted mb-0">View and respond to inquiries sent by interested students for your listings</p>
+      </div>
+
+      <hr class="mb-4 opacity-50" />
+
+      <!-- Inbox List -->
+      <div class="d-flex flex-column gap-4" th:if="${not #lists.isEmpty(inquiries)}">
+        <div th:each="inquiry : ${inquiries}" class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-body transition-all">
+          
+          <div class="row align-items-start g-3">
+            <!-- Thumbnail & Item Info -->
+            <div class="col-md-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-3 overflow-hidden bg-secondary-subtle" style="width: 70px; height: 70px; flex-shrink: 0;">
+                  <img th:if="${inquiry.listing.imageUrl != null}"
+                       th:src="${inquiry.listing.imageUrl}"
+                       class="w-100 h-100"
+                       style="object-fit: cover;"
+                       alt="Thumbnail" />
+                  <div th:unless="${inquiry.listing.imageUrl != null}"
+                       class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                    <i class="bi bi-image"></i>
+                  </div>
+                </div>
+                <div class="overflow-hidden">
+                  <span class="text-muted small text-uppercase fw-bold font-monospace" style="font-size: 0.7rem;">Listing Info</span>
+                  <h6 class="fw-bold mb-0 text-truncate" th:text="${inquiry.listing.title}">Listing Title</h6>
+                  <span class="fw-extrabold text-success small" th:text="'€' + ${#numbers.formatDecimal(inquiry.listing.price, 1, 2)}">€0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buyer Sender details -->
+            <div class="col-md-3">
+              <div>
+                <span class="text-muted small text-uppercase fw-bold font-monospace" style="font-size: 0.7rem;">From Buyer</span>
+                <h6 class="fw-bold mb-0 text-truncate" th:text="${inquiry.buyer.fullName}">Buyer Name</h6>
+                <p class="text-muted mb-0 small text-truncate" th:text="${inquiry.buyer.email}">buyer@student.edu.gr</p>
+              </div>
+            </div>
+
+            <!-- Message details -->
+            <div class="col-md-4">
+              <div>
+                <span class="text-muted small text-uppercase fw-bold font-monospace" style="font-size: 0.7rem;">Message Details</span>
+                <p class="mb-0 text-body-secondary small p-3 bg-body-tertiary rounded-3 mt-1" 
+                   style="white-space: pre-wrap; font-style: italic; border-left: 3px solid var(--bs-primary);"
+                   th:text="'“' + ${inquiry.messageText} + '”'">
+                  Inquiry Message
+                </p>
+              </div>
+            </div>
+
+            <!-- Sent Time & Reply action -->
+            <div class="col-md-2 text-md-end d-flex flex-column justify-content-between align-items-md-end h-100">
+              <div class="mb-3">
+                <span class="text-muted d-block" style="font-size: 0.75rem;">Received</span>
+                <span class="fw-semibold small text-body-secondary" th:text="${#temporals.format(inquiry.sentAt, 'dd MMM, HH:mm')}">Date</span>
+              </div>
+              <div>
+                <a th:href="@{mailto:{email}?subject=Re: UniTrade Inquiry regarding {title}&body=Hi {name},%0A%0AReplying to your inquiry message regarding my listing: {title}.(email=${inquiry.buyer.email}, title=${inquiry.listing.title}, name=${inquiry.buyer.fullName})}" 
+                   class="btn btn-primary rounded-pill btn-sm px-3 fw-semibold">
+                  <i class="bi bi-reply-fill me-1"></i>Reply via Email
+                </a>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- Empty Inbox State -->
+      <div th:if="${#lists.isEmpty(inquiries)}" class="text-center py-5">
+        <div class="mb-4">
+          <i class="bi bi-chat-left-dots fs-1 text-muted"></i>
+        </div>
+        <h4 class="fw-bold">Your inbox is empty</h4>
+        <p class="text-muted max-width-md mx-auto">When other students send message inquiries regarding your active listings, they will show up here for you to read and reply.</p>
+        <a href="/" class="btn btn-outline-primary rounded-pill px-4 mt-3">
+          Back to Listings
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer th:replace="~{fragments :: footer}"></footer>
+
+  <!-- SCRIPTS -->
+  <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

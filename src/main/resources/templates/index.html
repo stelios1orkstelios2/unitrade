@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Home')}"></head>
+<body class="bg-body-secondary bg-opacity-10">
+
+  <!-- NAVBAR -->
+  <nav th:replace="~{fragments :: navbar}"></nav>
+
+  <div class="container my-5">
+    
+    <!-- Alert Messages -->
+    <div th:if="${param.inquirySent}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>Your inquiry message has been sent to the seller!
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${param.error != null && param.error[0] == 'cannot_inquire_own'}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>You cannot send inquiries on your own listing.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    <!-- HERO HERO BANNER -->
+    <div class="hero-banner text-center text-lg-start p-4 p-md-5">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h1 class="display-4 fw-extrabold mb-3">Campus Flea Market</h1>
+          <p class="lead mb-0 text-white-50">Buy, sell, and trade textbooks, electronics, furniture, and more with fellow students safely.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+          <a href="/new-listing" class="btn btn-light btn-lg px-4 fw-bold text-primary shadow">
+            <i class="bi bi-plus-lg me-2"></i>Sell Your Stuff
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- SIDEBAR / CATEGORIES -->
+      <div class="col-lg-3 mb-4">
+        <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 90px; z-index: 5;">
+          <h5 class="fw-bold mb-3 d-flex align-items-center">
+            <i class="bi bi-funnel me-2 text-primary"></i>Categories
+          </h5>
+          
+          <div class="d-flex flex-row flex-lg-column overflow-auto pb-2 pb-lg-0" style="white-space: nowrap;">
+            <a th:href="@{/(search=${searchQuery})}" 
+               class="category-pill text-center text-lg-start" 
+               th:classappend="${selectedCategory == null} ? 'active' : ''">
+              <i class="bi bi-grid-fill me-1"></i> All Categories
+            </a>
+            
+            <a th:each="cat : ${categories}" 
+               th:href="@{/(category=${cat.id}, search=${searchQuery})}" 
+               class="category-pill text-center text-lg-start"
+               th:classappend="${selectedCategory == cat.id} ? 'active' : ''"
+               th:text="${cat.name}">
+              Category
+            </a>
+          </div>
+          
+          <div class="mt-4 pt-3 border-top d-none d-lg-block" th:if="${searchQuery != null && !searchQuery.isEmpty()}">
+            <span class="text-muted small">Active Search:</span>
+            <div class="d-flex align-items-center mt-1">
+              <span class="badge bg-secondary text-truncate me-1" style="max-width: 150px;" th:text="${searchQuery}">Keyword</span>
+              <a th:href="@{/(category=${selectedCategory})}" class="text-danger small" title="Clear search"><i class="bi bi-x-circle-fill"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT: LISTINGS -->
+      <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold mb-0">Recent Listings</h3>
+          <span class="text-muted small" th:text="${listings.size()} + ' item(s) found'">0 items</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" th:if="${not #lists.isEmpty(listings)}">
+          <div class="col" th:each="listing : ${listings}">
+            <div class="card h-100 shadow-sm listing-card border-0 bg-card rounded-4">
+              
+              <!-- Card Image / Badge -->
+              <div class="card-img-container" style="height: 200px;">
+                <span th:if="${listing.status == 'AVAILABLE'}" class="badge bg-success badge-status">Available</span>
+                <span th:if="${listing.status == 'SOLD'}" class="badge bg-danger badge-status">Sold</span>
+                
+                <img th:if="${listing.imageUrl != null}"
+                     th:src="${listing.imageUrl}"
+                     class="card-img-top w-100 h-100"
+                     alt="Item"
+                     style="object-fit: cover;" />
+                <div th:unless="${listing.imageUrl != null}"
+                     class="w-100 h-100 bg-secondary-subtle text-muted d-flex flex-column align-items-center justify-content-center">
+                  <i class="bi bi-image fs-1 mb-2"></i>
+                  <span>No Image Available</span>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="card-title fw-bold mb-0 text-truncate" th:text="${listing.title}" style="max-width: 75%;">Title</h5>
+                  <span class="fs-5 fw-extrabold text-success" th:text="'€' + ${#numbers.formatDecimal(listing.price, 1, 2)}">€0.00</span>
+                </div>
+                
+                <span class="badge bg-primary-subtle text-primary mb-3 align-self-start font-monospace" th:text="${listing.category.name}">Category</span>
+                
+                <p class="card-text text-muted flex-grow-1 small" th:text="${#strings.abbreviate(listing.description, 120)}">Description</p>
+                
+                <div class="pt-3 border-top mt-3 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                      <i class="bi bi-person small"></i>
+                    </div>
+                    <div class="ms-2">
+                      <p class="mb-0 fw-bold small text-truncate" style="max-width: 110px;" th:text="${listing.seller.fullName}">Seller Name</p>
+                    </div>
+                  </div>
+                  <span class="text-muted small" th:text="${#temporals.format(listing.postedAt, 'dd MMM yyyy')}">Date</span>
+                </div>
+              </div>
+
+              <!-- Card Footer -->
+              <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                <button class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#contactModal"
+                        th:data-bs-seller-name="${listing.seller.fullName}"
+                        th:data-bs-seller-email="${listing.seller.email}"
+                        th:data-bs-listing-title="${listing.title}"
+                        th:data-bs-listing-id="${listing.id}"
+                        th:data-bs-is-owner="${#authorization.expression('isAuthenticated()') ? listing.seller.email == #authentication.name : false}"
+                        th:data-bs-is-logged-in="${#authorization.expression('isAuthenticated()')}">
+                  <i class="bi bi-chat-text me-2"></i>Contact Seller
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(listings)}" class="card border-0 shadow-sm p-5 text-center rounded-4 bg-card">
+          <div class="p-4">
+            <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
+            <h4 class="fw-bold">No listings found</h4>
+            <p class="text-muted">We couldn't find any items matching your filters. Try checking a different category or clearing search parameters.</p>
+            <a th:href="@{/}" class="btn btn-primary rounded-pill px-4 mt-2">View All Listings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT MODAL -->
+  <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <form id="contactForm" method="post" th:action="@{/listings/0/inquire}">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold" id="contactModalLabel"><i class="bi bi-chat-left-dots text-primary me-2"></i>Contact Seller</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="card bg-body-tertiary border-0 rounded-3 p-3 mb-4">
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-tag text-primary me-2"></i>
+                <span class="text-muted small">Inquiry about:</span>
+              </div>
+              <h6 class="fw-bold mb-0 text-truncate" id="modalListingTitle">Calculus 101 Book</h6>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-muted small fw-bold">Seller Information</label>
+              <div class="d-flex align-items-center p-3 border rounded-3">
+                <i class="bi bi-person-badge fs-3 text-primary me-3"></i>
+                <div>
+                  <h6 class="mb-1 fw-bold" id="modalSellerName">John Doe</h6>
+                  <p class="mb-0 text-muted small" id="modalSellerEmail">jdoe@student.edu</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message box for buyers -->
+            <div id="modalInquirySection" class="mb-3">
+              <label for="messageText" class="form-label text-muted small fw-bold">Message Text</label>
+              <textarea class="form-control" name="messageText" id="messageText" rows="3" placeholder="Hi, is this item still available? I would like to buy it." required></textarea>
+            </div>
+
+            <!-- Warning if owner -->
+            <div id="modalOwnerWarning" class="alert alert-info rounded-3 small mb-0 d-none">
+              <i class="bi bi-info-circle-fill me-2"></i>You are the seller of this item.
+            </div>
+
+            <!-- Warning if guest -->
+            <div id="modalGuestWarning" class="alert alert-warning rounded-3 small mb-0 d-none">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>You must be logged in to send message inquiries on this platform.
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" id="modalSubmitButton" class="btn btn-primary rounded-pill px-4">
+              <i class="bi bi-send-fill me-2"></i>Send Message
+            </button>
+            <a href="/login" id="modalLoginButton" class="btn btn-primary rounded-pill px-4 d-none">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Log In
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer th:replace="~{fragments :: footer}"></footer>
+
+  <!-- SCRIPTS -->
+  <div th:replace="~{fragments :: scripts}"></div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const contactModal = document.getElementById('contactModal');
+      if (contactModal) {
+        contactModal.addEventListener('show.bs.modal', (event) => {
+          const button = event.relatedTarget;
+          const sellerName = button.getAttribute('data-bs-seller-name');
+          const sellerEmail = button.getAttribute('data-bs-seller-email');
+          const listingTitle = button.getAttribute('data-bs-listing-title');
+          const listingId = button.getAttribute('data-bs-listing-id');
+          const isOwner = button.getAttribute('data-bs-is-owner') === 'true';
+          const isLoggedIn = button.getAttribute('data-bs-is-logged-in') === 'true';
+          
+          contactModal.querySelector('#modalSellerName').textContent = sellerName;
+          contactModal.querySelector('#modalSellerEmail').textContent = sellerEmail;
+          contactModal.querySelector('#modalListingTitle').textContent = listingTitle;
+          
+          // Update form action dynamically
+          const form = contactModal.querySelector('#contactForm');
+          form.action = `/listings/${listingId}/inquire`;
+          
+          // Toggle modal sections based on auth and ownership state
+          const inquirySection = contactModal.querySelector('#modalInquirySection');
+          const ownerWarning = contactModal.querySelector('#modalOwnerWarning');
+          const guestWarning = contactModal.querySelector('#modalGuestWarning');
+          const submitBtn = contactModal.querySelector('#modalSubmitButton');
+          const loginBtn = contactModal.querySelector('#modalLoginButton');
+          
+          if (!isLoggedIn) {
+            inquirySection.classList.add('d-none');
+            ownerWarning.classList.add('d-none');
+            guestWarning.classList.remove('d-none');
+            submitBtn.classList.add('d-none');
+            loginBtn.classList.remove('d-none');
+          } else if (isOwner) {
+            inquirySection.classList.add('d-none');
+            ownerWarning.classList.remove('d-none');
+            guestWarning.classList.add('d-none');
+            submitBtn.classList.add('d-none');
+            loginBtn.classList.add('d-none');
+          } else {
+            inquirySection.classList.remove('d-none');
+            ownerWarning.classList.add('d-none');
+            guestWarning.classList.add('d-none');
+            submitBtn.classList.remove('d-none');
+            loginBtn.classList.add('d-none');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

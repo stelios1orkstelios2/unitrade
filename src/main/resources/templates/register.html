@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Register')}"></head>
+<body class="bg-body-secondary bg-opacity-10">
+
+  <!-- NAVBAR -->
+  <nav th:replace="~{fragments :: navbar}"></nav>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+              <i class="bi bi-person-plus-fill fs-2"></i>
+            </div>
+            <h3 class="fw-bold mb-1">Create Account</h3>
+            <p class="text-muted small">Join your campus marketplace today</p>
+          </div>
+
+          <!-- Alert for domain restriction reminder -->
+          <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-warning-emphasis p-3 rounded-3 small mb-4">
+            <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Student Verification</h6>
+            UniTrade is exclusive to students. You must use an email ending in <strong>.edu</strong> or <strong>.edu.gr</strong> to sign up.
+          </div>
+
+          <!-- Validation Errors -->
+          <div th:if="${emailError != null}" class="alert alert-danger rounded-3 small mb-3">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span th:text="${emailError}">Email error message</span>
+          </div>
+          
+          <div th:if="${passwordError != null}" class="alert alert-danger rounded-3 small mb-3">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span th:text="${passwordError}">Password error message</span>
+          </div>
+
+          <form th:action="@{/register}" th:object="${user}" method="post">
+            
+            <!-- Full Name Input -->
+            <div class="mb-3">
+              <label for="fullName" class="form-label fw-semibold">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="bi bi-person text-muted"></i></span>
+                <input type="text" 
+                       class="form-control" 
+                       id="fullName" 
+                       th:field="*{fullName}" 
+                       required 
+                       placeholder="e.g., Alex Johnson" />
+              </div>
+            </div>
+
+            <!-- Email Input -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Student Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="bi bi-envelope text-muted"></i></span>
+                <input type="email" 
+                       class="form-control" 
+                       id="email" 
+                       th:field="*{email}" 
+                       required 
+                       placeholder="e.g., alexj@student.edu.gr" />
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-4">
+              <label for="password" class="form-label fw-semibold">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="bi bi-lock text-muted"></i></span>
+                <input type="password" 
+                       class="form-control" 
+                       id="password" 
+                       th:field="*{password}" 
+                       required 
+                       placeholder="At least 6 characters" />
+              </div>
+              <div class="form-text small">Use a secure password containing at least 6 characters.</div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2.5 fw-semibold mb-3">
+              Create Account
+            </button>
+          </form>
+
+          <div class="text-center mt-3">
+            <span class="text-muted small">Already have an account?</span>
+            <a href="/login" class="small fw-semibold text-decoration-none ms-1">Log in here</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer th:replace="~{fragments :: footer}"></footer>
+
+  <!-- SCRIPTS -->
+  <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

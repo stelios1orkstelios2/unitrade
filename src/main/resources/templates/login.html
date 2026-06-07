@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Login')}"></head>
+<body class="bg-body-secondary bg-opacity-10">
+
+  <!-- NAVBAR -->
+  <nav th:replace="~{fragments :: navbar}"></nav>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+              <i class="bi bi-shield-lock-fill fs-2"></i>
+            </div>
+            <h3 class="fw-bold mb-1">Welcome Back</h3>
+            <p class="text-muted small">Sign in to your UniTrade student account</p>
+          </div>
+
+          <!-- Alert panels -->
+          <div th:if="${loginError != null}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${loginError}">Error Message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <div th:if="${logoutMessage != null}" class="alert alert-info alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <span th:text="${logoutMessage}">Logout Message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <div th:if="${successMessage != null}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Success Message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <form th:action="@{/login}" method="post">
+            <!-- Email Input -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Email address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="bi bi-envelope text-muted"></i></span>
+                <input type="email" 
+                       class="form-control" 
+                       id="email" 
+                       name="email" 
+                       required 
+                       placeholder="yourname@student.edu.gr" />
+              </div>
+              <div class="form-text small">Use your university student email.</div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between">
+                <label for="password" class="form-label fw-semibold">Password</label>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="bi bi-lock text-muted"></i></span>
+                <input type="password" 
+                       class="form-control" 
+                       id="password" 
+                       name="password" 
+                       required 
+                       placeholder="••••••••" />
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2.5 fw-semibold mb-3">
+              Log In
+            </button>
+          </form>
+
+          <div class="text-center mt-3">
+            <span class="text-muted small">New to UniTrade?</span>
+            <a href="/register" class="small fw-semibold text-decoration-none ms-1">Create an account</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer th:replace="~{fragments :: footer}"></footer>
+
+  <!-- SCRIPTS -->
+  <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>
